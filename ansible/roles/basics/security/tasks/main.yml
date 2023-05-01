@@ -1,0 +1,60 @@
+---
+- name: "Install security packages"
+  ansible.builtin.apt:
+    pkg:
+      - sysstat
+      - libpam-cracklib
+      - lynis
+      - ntpdate
+      - auditd
+      - debsecan
+      - debian-goodies
+      - fail2ban
+      - debsums
+      - needrestart
+      - apt-listchanges
+      - libpam-tmpdir
+      - rkhunter
+      - acct
+      - arpon
+      - apt-show-versions
+
+- name: Logins defs
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/login.defs"
+    dest: /etc/login.defs
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Issue
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/issue"
+    dest: /etc/issue
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Issue.net
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/issue.net"
+    dest: /etc/issue.net
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Issue.net
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/jail.local"
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Kernel fixes
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/99-custom.conf"
+    dest: /etc/sysctl.d/99-custom.conf
+    owner: root
+    group: root
+    mode: "0644"

@@ -1,0 +1,10 @@
+---
+
+nimiq:
+  network_setting: test-albatross
+  seed_nodes: /dns4/seed1.pos.nimiq-testnet.com/tcp/8443/wss
+  image: maestroi/nimiq-albatross:stable
+  metrics_port: 9200
+  rpc_port: 8648
+  listen_port: 8443
+  secret_location: /opt/nimiq/secrets

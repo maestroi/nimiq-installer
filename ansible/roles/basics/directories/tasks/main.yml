@@ -1,0 +1,14 @@
+---
+- name: Create multiple directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:
+    - '/opt/nimiq/'
+    - '/opt/nimiq/configuration'
+    - '/opt/nimiq/secrets/'
+    - '/opt/nimiq/data'
+    - '/opt/nimiq/bin'

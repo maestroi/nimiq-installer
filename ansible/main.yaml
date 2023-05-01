@@ -1,0 +1,25 @@
+- name: basic upgrades
+  hosts: localhost
+  become: true
+  roles:
+    - basics/updates
+    - basics/security
+    - basics/container
+    - basics/ufw
+    - basics/user
+  tags: basics
+
+- name: Validators
+  hosts: localhost
+  roles:
+    - nimiq/validator/gen_keys
+    - nimiq/validator/validator
+    - watchtower
+  tags: validator
+
+- name: Full_node
+  hosts: localhost
+  roles:
+    - nimiq/full_node/rpc
+    - watchtower
+  tags: full_node

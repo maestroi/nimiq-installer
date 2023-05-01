@@ -1,0 +1,70 @@
+---
+- name: Create a network
+  community.docker.docker_network:
+    name: webserver
+
+- name: Read file contents
+  slurp:
+    src: /opt/nimiq/secrets/address.txt
+  register: file_contents
+  delegate_to: localhost
+  become: true
+
+- set_fact:
+    address: "{{ file_contents.content | b64decode | regex_search('^Address:\s+(.*)$', multiline=True) | first }}"
+
+- name: Render client.toml
+  ansible.builtin.template:
+    src: client.toml.j2
+    dest: /opt/nimiq/client.toml
+    owner: root
+    group: root
+    mode: "0755"
+    backup: true
+  register: node_config
+
+- name: Run validator node container
+  community.docker.docker_container:
+    name: "validator"
+    restart_policy: unless-stopped
+    restart: "{{ true if node_config.changed else false }}"
+    environment:
+      RPC_ENABLED: "true"
+      NIMIQ_INSTANT_INBOUND: "true"
+    networks:
+      - name: "webserver"
+    image: "{{ nimiq.image }}"
+    published_ports:
+      - "{{ nimiq.listen_port }}:{{ nimiq.listen_port }}"
+      - "{{ nimiq.rpc_port }}:{{ nimiq.rpc_port }}"
+      - "{{ nimiq.metrics_port }}:{{ nimiq.metrics_port }}"
+    volumes:
+      - /opt/nimiq/configuration/client.toml:/home/nimiq/.nimiq/client.toml
+      - /opt/nimiq/data:/home/nimiq/.nimiq/testalbatross-history-consensus
+
+# ------------------------------------------------------------
+# Activate validator
+# ------------------------------------------------------------
+
+- name: Copy file with owner and permissions
+  ansible.builtin.copy:
+    src: activate_validator.py
+    dest: /opt/nimiq/bin/activate_validator.py
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install requests
+  ansible.builtin.pip:
+    name: requests
+    state: present
+
+- name: Run Python script
+  ansible.builtin.command: python3 /opt/nimiq/bin/activate_validator.py
+
+- name: Allow seeding
+  community.general.ufw:
+    rule: allow
+    port: "{{ nimiq.listen_port }}"
+    proto: tcp
+

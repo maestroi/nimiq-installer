@@ -1,0 +1,13 @@
+---
+- name: Add the user nimiq with a bash shell
+  ansible.builtin.user:
+    name: nimiq
+    shell: /bin/bash
+    group: docker
+
+- name: Allow nimiq to do all
+  community.general.sudoers:
+    name: "nimiq"
+    state: present
+    user: "nimiq"
+    commands: ALL

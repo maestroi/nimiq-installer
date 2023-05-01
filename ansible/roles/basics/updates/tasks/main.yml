@@ -1,0 +1,45 @@
+- name: Wait for any possibly running unattended upgrade to finish
+  become_user: "root"
+  become: true
+  ansible.builtin.raw: systemd-run --property="After=apt-daily.service apt-daily-upgrade.service" --wait /bin/true
+  changed_when: false
+
+- name: Update apt cache
+  become: true
+  become_user: "root"
+  ansible.builtin.apt:
+    update_cache: true
+  register: apt_res
+  retries: 3
+  until: apt_res is success
+
+- name: Install a list of packages
+  ansible.builtin.apt:
+    pkg:
+      - python3
+      - python3-pip
+      - git
+      - curl
+      - jq
+      - nano
+      - unattended-upgrades
+      - apt-transport-https
+      - ca-certificates
+      - software-properties-common
+      - build-essential
+      - gnupg-agent
+      - aptitude
+      - ufw
+    state: present
+    update_cache: true
+  register: apt_res
+  retries: 2
+  until: apt_res is success
+
+- name: Remove useless packages from the cache
+  ansible.builtin.apt:
+    autoclean: true
+
+- name: Remove dependencies that are no longer required
+  ansible.builtin.apt:
+    autoremove: true

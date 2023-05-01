@@ -242,18 +242,6 @@ function activate_validator(){
 }
 
 
-# Create the protocol group with the specified GID (if it does not already exist)
-if ! getent group $protocol_uid &>/dev/null; then
-    echo -e "${GREEN}Creating group: $protocol_uid.${NC}"
-    groupadd -r -g $protocol_uid $username
-fi
-
-# Check if the user protocol exists, and create it if it doesn't
-if ! id -u $username > /dev/null 2>&1; then
-    echo -e "${GREEN}Creating user: $username with ID: $protocol_uid .${NC}"
-    id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_uid -s /usr/sbin/nologin $username
-
-fi
 
 # Update and upgrade Ubuntu
 echo -e "${GREEN}Updating and upgrading Ubuntu, may take a while....${NC}"
@@ -262,40 +250,8 @@ apt-get upgrade -y &>/dev/null
 
 # Install Docker and Docker Compose
 echo -e "${GREEN}Installing Docker and Docker Compose.${NC}"
-apt-get install -y docker.io docker-compose &>/dev/null
+apt-get install -y docker.io docker-compose ansbile &>/dev/null
 
-# Install some common packages
-echo -e "${GREEN}Installing common packages.${NC}"
-apt-get install -y curl jq libjq1 libonig5 git ufw fail2ban &>/dev/null
-
-# Check if the protocol user is already in the docker group, and add it if it's not
-if ! id -nG $username | grep -qw docker; then
-    echo -e "${GREEN}Adding user $username to the docker group.${NC}"
-    usermod -aG docker $username
-fi
-
-# Check if the directories already exist, and create them if they don't
-if [ ! -d "/opt/nimiq/configuration" ]; then
-    echo -e "${GREEN}Creating directory: /opt/nimiq/configuration.${NC}"
-    mkdir -p /opt/nimiq/configuration
-fi
-
-if [ ! -d "/opt/nimiq/data" ]; then
-    echo -e "${GREEN}Creating directory: /opt/nimiq/data.${NC}"
-    mkdir -p /opt/nimiq/data
-fi
-
-if [ ! -d "/opt/nimiq/secrets" ]; then
-    echo -e "${GREEN}Creating directory: /opt/nimiq/secrets.${NC}"
-    mkdir -p /opt/nimiq/secrets
-fi
-
-# Set permissions for the directories
-echo -e "${GREEN}Setting permissions for directories.${NC}"
-chown -R $protocol_uid:$protocol_uid /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
-chmod -R 750 /opt/nimiq/configuration
-chmod -R 755 /opt/nimiq/data
-chmod -R 740 /opt/nimiq/secrets
 
 #Set the RPC_ENABLED environment variable based on the node type
 if [ "$node_type" == "full_node" ]; then

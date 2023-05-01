@@ -1,0 +1,120 @@
+
+# ------------------------------------------------------------
+# Generate address for validator
+# ------------------------------------------------------------
+
+- name: Check if validator configuration exist
+  ansible.builtin.stat:
+    path: "{{ nimiq.secret_location }}/address.txt"
+  register: address_config
+
+- name: Generate address account
+  when: not address_config.stat.exists
+  block:
+    - name: Generate address
+      become: true
+      become_user: "root"
+      ansible.builtin.command:
+        chdir: "{{ nimiq.secret_location }}/"
+        argv:
+          - "docker"
+          - "run"
+          - "--rm"
+          - "--name"
+          - "nimiq-address"
+          - "{{ nimiq.image }}"
+          - "nimiq-address"
+          - ">"
+          - "address.txt"
+        creates: "{{ nimiq.secret_location }}/address.txt"
+      register: address_config_errors
+
+# ------------------------------------------------------------
+# Generate fee key for validator
+# ------------------------------------------------------------
+
+- name: Check if validator configuration exist
+  ansible.builtin.stat:
+    path: "{{ nimiq.secret_location }}/fee_key.txt"
+  register: fee_key_config
+
+- name: Generate fee_key account
+  when: not fee_key_config.stat.exists
+  block:
+    - name: Generate fee_key
+      become: true
+      become_user: "root"
+      ansible.builtin.command:
+        chdir: "{{ nimiq.secret_location }}/"
+        argv:
+          - "docker"
+          - "run"
+          - "--rm"
+          - "--name"
+          - "nimiq-address"
+          - "{{ nimiq.image }}"
+          - "nimiq-address"
+          - ">"
+          - "fee_key.txt"
+        creates: "{{ nimiq.secret_location }}/fee_key.txt"
+      register: address_config_errors
+
+# ------------------------------------------------------------
+# Generate signing key for validator
+# ------------------------------------------------------------
+
+- name: Check if validator configuration exist
+  ansible.builtin.stat:
+    path: "{{ nimiq.secret_location }}/signing_key.txt"
+  register: signing_key_config
+
+- name: Generate signing_key account
+  when: not signing_key_config.stat.exists
+  block:
+    - name: Generate signing_key
+      become: true
+      become_user: "root"
+      ansible.builtin.command:
+        chdir: "{{ nimiq.secret_location }}/"
+        argv:
+          - "docker"
+          - "run"
+          - "--rm"
+          - "--name"
+          - "nimiq-address"
+          - "{{ nimiq.image }}"
+          - "nimiq-address"
+          - ">"
+          - "signing_key.txt"
+        creates: "{{ nimiq.secret_location }}/signing_key.txt"
+      register: address_config_errors
+
+# ------------------------------------------------------------
+# Generate vote key for validator
+# ------------------------------------------------------------
+
+- name: Check if validator configuration exist
+  ansible.builtin.stat:
+    path: "{{ nimiq.secret_location }}/vote_key.txt"
+  register: vote_key_config
+
+- name: Generate vote_key account
+  when: not vote_key_config.stat.exists
+  block:
+    - name: Generate vote_key
+      become: true
+      become_user: "root"
+      ansible.builtin.command:
+        chdir: "{{ nimiq.secret_location }}/"
+        argv:
+          - "docker"
+          - "run"
+          - "--rm"
+          - "--name"
+          - "nimiq-bls"
+          - "{{ nimiq.image }}"
+          - "nimiq-bls"
+          - ">"
+          - "vote_key.txt"
+        creates: "{{ nimiq.secret_location }}/vote_key.txt"
+      register: address_config_errors

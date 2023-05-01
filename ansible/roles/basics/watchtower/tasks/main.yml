@@ -1,0 +1,26 @@
+---
+- name: Start watchtower container for public
+  community.docker.docker_container:
+    name: "watchtower_public"
+    image: containrrr/watchtower
+    state: started
+    pull: true
+    restart_policy: unless-stopped
+    env:
+      WATCHTOWER_POLL_INTERVAL: "900"
+      TZ: "UTC"
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_REMOVE_VOLUMES: "true"
+      NO_COLOR: "true"
+      DOCKER_HOST: "unix:///var/run/docker.sock"
+      WATCHTOWER_INCLUDE_RESTARTING: "true"
+      WATCHTOWER_INCLUDE_STOPPED: "true"
+      WATCHTOWER_REVIVE_STOPPED: "true"
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_SCOPE: "public"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    entrypoint: ["/watchtower"]
+    labels:
+      "com.centurylinklabs.watchtower.enable": "true"
+      "com.centurylinklabs.watchtower.scope": "public"

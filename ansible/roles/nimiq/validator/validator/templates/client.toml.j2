@@ -1,16 +1,16 @@
 [network]
 peer_key_file = "peer_key.dat"
 listen_addresses = [
-	"/ip4/0.0.0.0/tcp/8443/ws",
+	"/ip4/0.0.0.0/tcp/{{ nimiq.rpc_listen_port }}/ws",
 ]
 
 seed_nodes = [
-        { address = "/dns4/seed1.pos.nimiq-testnet.com/tcp/8443/wss" }
+        { address = "{{ nimiq.seed_nodes }}" }
 ]
 
 [consensus]
 sync_mode = "history"
-network = "test-albatross"
+network = "{{ nimiq.network_setting }}"
 min_peers = 1
 
 [zkp]
@@ -33,7 +33,7 @@ bind="0.0.0.0"
 # TCP-Port to use to create a listening socket for the JSON-RPC server.
 # Possible values: any valid port number
 # Default: 8648
-port = 8648
+port = {{ nimiq.rpc_port }}
 
 # Allow only the RPC methods listed here. All methods are allowed if this is empty.
 # Example: ["getBlockByNumber", "peerCount"],
@@ -55,7 +55,7 @@ bind = "0.0.0.0"
 # Port to use to create a listening socket for the metrics server.
 # Possible values: any valid port number
 # Default: 9100
-port = 9200
+port = {{ nimiq.metrics_port }}
 
 # Declare a username and password required to access the metrics server.
 # Default: none
@@ -74,11 +74,11 @@ timestamps = true
 libp2p_swarm = "info"
 
 [validator]
-validator_address = "CHANGE_VALIDATOR_ADDRESS"
-voting_key = "CHANGE_VOTE_KEY"
+validator_address = "{{ address }}"
+voting_key = "{{ vote_key }}"
 voting_key_file = "voting_key.dat"
 signing_key_file = "signing_key.dat"
-signing_key = "CHNAGE_SIGN_KEY"
+signing_key = "{{ change_key }}"
 fee_key_file = "fee_key.dat"
-fee_key = "CHANGE_FEE_KEY"
+fee_key = "{{ fee_key }}"
 automatic_reactivate = true
